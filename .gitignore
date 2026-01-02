@@ -23,6 +23,9 @@
 # misc
 .DS_Store
 *.pem
+.cursor/
+.temp-streamline-vectors/
+*.backup
 
 # debug
 npm-debug.log*
