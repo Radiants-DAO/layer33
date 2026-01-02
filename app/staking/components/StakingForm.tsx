@@ -177,7 +177,7 @@ export function StakingForm() {
                 Total Balance: 0 INDIESOL
               </Label>
             </div>
-            <div className="recieved-field">
+            <div className="received-field">
               {indiesolAmount} INDIESOL
             </div>
           </div>

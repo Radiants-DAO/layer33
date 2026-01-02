@@ -827,7 +827,7 @@ body {
    Received Field
    ============================================================================ */
 
-.recieved-field {
+.received-field {
   border: 1px solid var(--color-green);
   background-color: rgba(39, 255, 147, 0.31); /* #27ff934f - green with opacity */
   border-radius: .125rem;
