@@ -19,9 +19,8 @@ User confirmed: design-system page should be removed entirely. Component canvas 
 - [ ] `app/design-system/` directory deleted
 - [ ] Route `/design-system` no longer accessible
 ## Done summary
-TBD
-
+Deleted the app/design-system/ directory which contained a page that imported from the now-deleted devtools module.
 ## Evidence
-- Commits:
-- Tests:
+- Commits: 97b797267c77cc0f82718012586e9162a8b0cca9
+- Tests: ls app/design-system/ - confirmed directory deleted
 - PRs:

@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { useMockState } from '@/devtools/hooks/useMockState';
-import { useDevToolsStore } from '@/devtools/store';
 import { useToast } from '@/components/ui/Toast';
 import type { 
   StakingState, 
@@ -34,13 +32,13 @@ interface WalletState {
 
 export function useStaking(options?: UseStakingOptions) {
   const { addToast } = useToast();
-  const walletState = useMockState<WalletState>('wallet');
-  const { mockStates, updateMockStateValue } = useDevToolsStore();
 
-  // Find active wallet state for simulation
-  const activeWalletState = mockStates.find(
-    (s) => s.category === 'wallet' && s.active
-  );
+  // Wallet state - disconnected by default, will be updated by real wallet adapter
+  const [walletState, setWalletState] = useState<WalletState>({
+    isConnected: false,
+    address: null,
+    balance: '0',
+  });
 
   // Local state
   const [amount, setAmount] = useState('');
@@ -51,11 +49,11 @@ export function useStaking(options?: UseStakingOptions) {
   // Track connecting state locally
   const [isConnecting, setIsConnecting] = useState(false);
 
-  // Derive wallet status from mock state
+  // Derive wallet status from state
   const walletStatus: WalletConnectionStatus = isConnecting
     ? 'connecting'
-    : walletState?.isConnected 
-    ? 'connected' 
+    : walletState.isConnected
+    ? 'connected'
     : transactionStatus === 'signing' || transactionStatus === 'pending'
     ? 'connected' // Stay connected during transaction
     : 'disconnected';
@@ -63,20 +61,15 @@ export function useStaking(options?: UseStakingOptions) {
   // Exchange rate (1:1 for now)
   const exchangeRate = '1.0';
 
-  // Calculate estimated receive amount
-  const estimatedReceive = amount 
-    ? (parseFloat(amount) * parseFloat(exchangeRate)).toFixed(2)
-    : '0.00';
-
-  // Position (null for now, can be populated from mock state later)
+  // Position (null for now, can be populated from real staking data later)
   const position: StakingPosition | null = null;
 
   // Build state object
   const state: StakingState = {
     wallet: {
       status: walletStatus,
-      address: walletState?.address ?? null,
-      balance: walletState?.balance ?? '0',
+      address: walletState.address,
+      balance: walletState.balance,
     },
     transaction: {
       status: transactionStatus,
@@ -91,17 +84,17 @@ export function useStaking(options?: UseStakingOptions) {
   // Connect wallet
   const connect = useCallback(async () => {
     setIsConnecting(true);
-    
+
     if (options?.onConnect) {
-      // Real implementation
+      // Real wallet adapter implementation
       try {
         setTransactionStatus('idle');
         const result = await options.onConnect();
-        if (activeWalletState) {
-          updateMockStateValue(activeWalletState.id, 'isConnected', true);
-          updateMockStateValue(activeWalletState.id, 'address', result.address);
-          updateMockStateValue(activeWalletState.id, 'balance', result.balance);
-        }
+        setWalletState({
+          isConnected: true,
+          address: result.address,
+          balance: result.balance,
+        });
         setIsConnecting(false);
         addToast({
           title: 'Wallet Connected',
@@ -117,38 +110,16 @@ export function useStaking(options?: UseStakingOptions) {
         });
       }
     } else {
-      // Simulation - add delay to show connecting state
-      setTimeout(() => {
-        if (activeWalletState) {
-          // Update existing active wallet state
-          updateMockStateValue(activeWalletState.id, 'isConnected', true);
-          if (!activeWalletState.values.address) {
-            updateMockStateValue(activeWalletState.id, 'address', '0x1234567890abcdef1234567890abcdef12345678');
-          }
-          if (!activeWalletState.values.balance || activeWalletState.values.balance === '0') {
-            updateMockStateValue(activeWalletState.id, 'balance', '1.5');
-          }
-          setIsConnecting(false);
-          addToast({
-            title: 'Wallet Connected',
-            description: 'Your wallet has been connected successfully.',
-            variant: 'success',
-          });
-        } else {
-          // No active wallet mock state - activate wallet-connected preset
-          // First, we need to toggle the wallet-connected state from the store
-          const { toggleMockState } = useDevToolsStore.getState();
-          toggleMockState('wallet-connected');
-          setIsConnecting(false);
-          addToast({
-            title: 'Wallet Connected',
-            description: 'Your wallet has been connected successfully. (Mock wallet-connected state activated)',
-            variant: 'success',
-          });
-        }
-      }, 1000);
+      // No wallet adapter provided - connection is a no-op
+      // Real wallet integration should be provided via options.onConnect
+      setIsConnecting(false);
+      addToast({
+        title: 'Wallet Not Available',
+        description: 'No wallet adapter configured. Please integrate a Solana wallet adapter.',
+        variant: 'warning',
+      });
     }
-  }, [options, activeWalletState, updateMockStateValue, addToast]);
+  }, [options, addToast]);
 
   // Disconnect wallet
   const disconnect = useCallback(async () => {
@@ -156,14 +127,16 @@ export function useStaking(options?: UseStakingOptions) {
       await options.onDisconnect();
     }
     setIsConnecting(false);
-    if (activeWalletState) {
-      updateMockStateValue(activeWalletState.id, 'isConnected', false);
-    }
+    setWalletState({
+      isConnected: false,
+      address: null,
+      balance: '0',
+    });
     setAmount('');
     setTransactionStatus('idle');
     setSignature(undefined);
     setTransactionError(undefined);
-  }, [options, activeWalletState, updateMockStateValue]);
+  }, [options]);
 
   // Set stake amount
   const handleSetAmount = useCallback((newAmount: string) => {
@@ -182,7 +155,7 @@ export function useStaking(options?: UseStakingOptions) {
       return;
     }
 
-    const balance = parseFloat(walletState?.balance ?? '0');
+    const balance = parseFloat(walletState.balance);
     if (parseFloat(amount) > balance) {
       addToast({
         title: 'Insufficient Balance',
@@ -254,41 +227,14 @@ export function useStaking(options?: UseStakingOptions) {
         }, 3000);
       }
     } else {
-      // Simulation
-      setTransactionStatus('signing');
-      setTransactionError(undefined);
-      
-      // Simulate wallet approval delay
-      setTimeout(() => {
-        setTransactionStatus('pending');
-        addToast({
-          title: 'Transaction Submitted',
-          description: 'Your transaction has been submitted to the network.',
-          variant: 'info',
-        });
-
-        // Simulate confirmation delay
-        setTimeout(() => {
-          const mockSignature = `sig_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
-          setSignature(mockSignature);
-          setTransactionStatus('success');
-          
-          addToast({
-            title: 'Stake Successful!',
-            description: `Transaction confirmed: ${mockSignature.slice(0, 8)}...${mockSignature.slice(-8)}`,
-            variant: 'success',
-          });
-          
-          // Reset to idle after showing success
-          setTimeout(() => {
-            setTransactionStatus('idle');
-            setAmount('');
-            setSignature(undefined);
-          }, 2000);
-        }, 2000);
-      }, 1000);
+      // No wallet adapter - stake is a no-op
+      addToast({
+        title: 'Wallet Not Connected',
+        description: 'Please connect a wallet to stake.',
+        variant: 'warning',
+      });
     }
-  }, [amount, walletState, options, addToast]);
+  }, [amount, walletState.balance, options, addToast]);
 
   // Reset transaction state
   const reset = useCallback(() => {
@@ -326,10 +272,11 @@ export function useStaking(options?: UseStakingOptions) {
     }, [addToast]),
     
     setBalance: useCallback((newBalance: string) => {
-      if (activeWalletState) {
-        updateMockStateValue(activeWalletState.id, 'balance', newBalance);
-      }
-    }, [activeWalletState, updateMockStateValue]),
+      setWalletState((prev) => ({
+        ...prev,
+        balance: newBalance,
+      }));
+    }, []),
   };
 
   return {
