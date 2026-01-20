@@ -23,14 +23,13 @@ npm uninstall react-draggable
 - Check no other files import react-draggable
 - Check no other files import AppWindow
 ## Acceptance
-- [ ] `components/Rad_os/AppWindow.tsx` deleted
-- [ ] `react-draggable` removed from package.json
-- [ ] No other files import AppWindow
-- [ ] No other files import react-draggable
+- [x] `components/Rad_os/AppWindow.tsx` deleted
+- [x] `react-draggable` removed from package.json
+- [x] No other files import AppWindow
+- [x] No other files import react-draggable
 ## Done summary
-TBD
-
+Deleted AppWindow.tsx component and removed react-draggable dependency. Updated CLAUDE.md to reflect remaining Rad_os components.
 ## Evidence
-- Commits:
-- Tests:
+- Commits: de8722fd7f3deed6822466f1cb9e0031fee8e32d
+- Tests: npm run lint
 - PRs:
