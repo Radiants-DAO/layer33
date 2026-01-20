@@ -70,6 +70,7 @@ const accordionTriggerBaseStyles = `
   bg-transparent
   hover:text-neutral-neutral-3
   cursor-pointer
+  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2
 `;
 
 /**

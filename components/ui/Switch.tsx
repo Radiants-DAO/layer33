@@ -99,7 +99,7 @@ export function Switch({
         border border-black
         ${checked ? 'bg-green' : 'bg-neutral-neutral-1'}
         ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-        focus:outline-none focus:ring-2 focus:ring-green focus:ring-offset-2
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2
       `.trim()}
     >
       {/* Thumb */}

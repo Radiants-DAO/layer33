@@ -56,12 +56,12 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
             border border-black
             rounded-none
             peer-checked:bg-green
-            peer-focus:ring-2 peer-focus:ring-green peer-focus:ring-offset-1
+            peer-focus-visible:ring-2 peer-focus-visible:ring-green peer-focus-visible:ring-offset-1
             flex items-center justify-center
           `}
         />
         {/* Checkmark - visible when checkbox is checked */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 pointer-events-none" aria-hidden="true">
           <Icon
             name="checkmark"
             size={14}
@@ -113,7 +113,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
             border border-black
             rounded-full
             peer-checked:bg-green
-            peer-focus:ring-2 peer-focus:ring-green peer-focus:ring-offset-1
+            peer-focus-visible:ring-2 peer-focus-visible:ring-green peer-focus-visible:ring-offset-1
             flex items-center justify-center
           `}
         >
@@ -122,6 +122,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
         {/* Inner dot when checked */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-black rounded-full opacity-0 peer-checked:opacity-100 pointer-events-none"
+          aria-hidden="true"
         />
       </div>
       {label && (

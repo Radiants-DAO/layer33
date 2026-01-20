@@ -47,7 +47,7 @@ export function Breadcrumbs({
           const isLast = index === items.length - 1;
 
           return (
-            <li key={index} className="flex items-center gap-2">
+            <li key={item.href || item.label} className="flex items-center gap-2">
               {/* Separator */}
               {index > 0 && (
                 <span

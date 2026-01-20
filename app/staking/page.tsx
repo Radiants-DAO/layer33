@@ -23,6 +23,8 @@ export default function StakingPage() {
                 <img
                   src="/images/bg.png"
                   alt=""
+                  width={1024}
+                  height={768}
                   className="bg_img absolute inset-0 w-full h-full max-w-none"
                   style={{
                     zIndex: 0,

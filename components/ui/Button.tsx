@@ -78,6 +78,7 @@ const baseStyles = `
   hover:-translate-y-0.5
   active:shadow-none
   active:translate-y-0.5
+  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2
   disabled:cursor-not-allowed
   disabled:hover:translate-y-0 disabled:hover:shadow-none
 `;
@@ -230,11 +231,11 @@ export function Button(props: ButtonProps) {
   ) : iconName && hasIconAndText ? (
     <>
       {children}
-      <Icon name={iconName} size={iconSize} />
+      <Icon name={iconName} size={iconSize} aria-hidden="true" />
     </>
   ) : iconName ? (
     <>
-      <Icon name={iconName} size={iconSize} />
+      <Icon name={iconName} size={iconSize} aria-hidden="true" />
       {!iconOnly && children}
     </>
   ) : (

@@ -47,7 +47,7 @@ const baseStyles = `
   font-alfacad
   rounded-none
   focus:outline-none
-  focus:ring-2 focus:ring-offset-0
+  focus-visible:ring-2 focus-visible:ring-offset-0
   disabled:opacity-50 disabled:cursor-not-allowed
 `;
 
@@ -59,13 +59,13 @@ const variantStyles: Record<InputVariant, string> = {
     bg-white text-black
     border border-black
     placeholder:text-neutral-neutral-3
-    focus:ring-green
+    focus-visible:ring-green
   `,
   dark: `
     bg-black text-white
     border border-white
     placeholder:text-neutral-neutral-3
-    focus:ring-white
+    focus-visible:ring-white
   `,
 };
 
@@ -129,7 +129,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   if (iconName) {
     return (
       <div className="relative">
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true">
           <Icon name={iconName} size={iconSize} className={iconColor} />
         </div>
         {input}

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { useEscapeKey, useLockBodyScroll } from './hooks/useModalBehavior';
+import { useEscapeKey, useLockBodyScroll, useFocusTrap } from './hooks/useModalBehavior';
 
 // ============================================================================
 // Types
@@ -93,7 +93,7 @@ export function SheetTrigger({ children, asChild }: SheetTriggerProps) {
   }
 
   return (
-    <button type="button" onClick={() => setOpen(true)}>
+    <button type="button" onClick={() => setOpen(true)} aria-haspopup="dialog">
       {children}
     </button>
   );
@@ -137,6 +137,7 @@ export function SheetContent({ className = '', children }: SheetContentProps) {
   const { open, setOpen, side } = useSheetContext();
   const [mounted, setMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const contentRef = React.useRef<HTMLDivElement>(null);
   const styles = sideStyles[side];
 
   useEffect(() => {
@@ -162,6 +163,9 @@ export function SheetContent({ className = '', children }: SheetContentProps) {
   // Prevent body scroll when open
   useLockBodyScroll(open);
 
+  // Trap focus within sheet
+  useFocusTrap(open, contentRef);
+
   if (!mounted || !isVisible) return null;
 
   return createPortal(
@@ -179,6 +183,7 @@ export function SheetContent({ className = '', children }: SheetContentProps) {
 
       {/* Content */}
       <div
+        ref={contentRef}
         role="dialog"
         aria-modal="true"
         className={`
@@ -192,6 +197,7 @@ export function SheetContent({ className = '', children }: SheetContentProps) {
           ${side === 'bottom' ? 'border-t-2' : ''}
           shadow-[4px_4px_0_0_var(--color-black)]
           transform transition-transform duration-200 ease-out
+          overscroll-contain
           ${open ? styles.open : styles.closed}
           ${className}
         `.trim()}
@@ -307,7 +313,7 @@ export function SheetClose({ children, asChild }: SheetCloseProps) {
   }
 
   return (
-    <button type="button" onClick={() => setOpen(false)}>
+    <button type="button" onClick={() => setOpen(false)} aria-label="Close sheet">
       {children}
     </button>
   );

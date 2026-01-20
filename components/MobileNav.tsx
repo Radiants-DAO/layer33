@@ -154,7 +154,7 @@ export function MobileNav({ menuItems }: MobileNavProps) {
               {/* Menu Items with Stagger Animation - slide in from top */}
               {menuItems.map((item, index) => (
                 <Card
-                  key={index}
+                  key={item.href}
                   variant={item.variant || 'default'}
                   disableHover={true}
                   className={`w-full mix-blend-difference flex flex-col gap-4 transition-all duration-500 ease-out ${

@@ -128,9 +128,18 @@ curl http://localhost:3000/api/radflow/health
 - [ ] `react-draggable` removed from package.json
 - [ ] `@radflow/bridge` still in next.config.ts
 ## Done summary
-TBD
+## Summary
+Removed devtools references from layout.tsx, CLAUDE.md, and README.md. Build passes.
 
+## Changes
+- Removed commented DevToolsProvider import from app/layout.tsx
+- Removed devtools references from CLAUDE.md
+- Removed devtools references from README.md
+
+## Verification
+- npm run build passes
+- rg "devtools" returns no matches outside .flow/
 ## Evidence
-- Commits:
-- Tests:
+- Commits: 91fc156075e19dfa20a8ed784b5a21091e631dc6
+- Tests: npm run build, rg devtools
 - PRs:

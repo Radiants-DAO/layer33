@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { useEscapeKey, useLockBodyScroll } from './hooks/useModalBehavior';
+import { useEscapeKey, useLockBodyScroll, useFocusTrap } from './hooks/useModalBehavior';
 
 // ============================================================================
 // Types
@@ -87,7 +87,7 @@ export function DialogTrigger({ children, asChild }: DialogTriggerProps) {
   }
 
   return (
-    <button type="button" onClick={() => setOpen(true)}>
+    <button type="button" onClick={() => setOpen(true)} aria-haspopup="dialog">
       {children}
     </button>
   );
@@ -107,6 +107,7 @@ interface DialogContentProps {
 export function DialogContent({ className = '', children }: DialogContentProps) {
   const { open, setOpen } = useDialogContext();
   const [mounted, setMounted] = useState(false);
+  const contentRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -118,6 +119,9 @@ export function DialogContent({ className = '', children }: DialogContentProps) 
   // Prevent body scroll when open
   useLockBodyScroll(open);
 
+  // Trap focus within dialog
+  useFocusTrap(open, contentRef);
+
   if (!mounted || !open) return null;
 
   return createPortal(
@@ -126,11 +130,17 @@ export function DialogContent({ className = '', children }: DialogContentProps) 
       <div
         className="absolute inset-0 bg-black/50 animate-fadeIn"
         onClick={() => setOpen(false)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            setOpen(false);
+          }
+        }}
         aria-hidden="true"
       />
 
       {/* Content */}
       <div
+        ref={contentRef}
         role="dialog"
         aria-modal="true"
         className={`
@@ -255,7 +265,7 @@ export function DialogClose({ children, asChild }: DialogCloseProps) {
   }
 
   return (
-    <button type="button" onClick={() => setOpen(false)}>
+    <button type="button" onClick={() => setOpen(false)} aria-label="Close dialog">
       {children}
     </button>
   );

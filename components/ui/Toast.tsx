@@ -159,7 +159,7 @@ function Toast({ toast, onClose }: ToastProps) {
       <div className="flex items-start gap-3">
         {/* Icon */}
         {displayIconName && (
-          <span className="flex-shrink-0">
+          <span className="flex-shrink-0" aria-hidden="true">
             <Icon name={displayIconName} size={16} />
           </span>
         )}
@@ -179,10 +179,10 @@ function Toast({ toast, onClose }: ToastProps) {
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="text-black/50 hover:text-black flex-shrink-0 -mt-1"
+          className="text-black/50 hover:text-black flex-shrink-0 -mt-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green rounded-sm"
           aria-label="Close"
         >
-          <Icon name="close" size={16} />
+          <Icon name="close" size={16} aria-hidden="true" />
         </button>
       </div>
     </div>

@@ -11,10 +11,19 @@
     "fn-1-cs3.6"
   ],
   "epic": "fn-1-cs3",
+  "evidence": {
+    "commits": [
+      "91fc156075e19dfa20a8ed784b5a21091e631dc6"
+    ],
+    "tests": [
+      "npm run build",
+      "rg devtools"
+    ]
+  },
   "id": "fn-1-cs3.5",
   "priority": null,
   "spec_path": ".flow/tasks/fn-1-cs3.5.md",
-  "status": "todo",
+  "status": "done",
   "title": "Update layout and CLAUDE.md, verify build",
-  "updated_at": "2026-01-20T01:17:23.693991Z"
+  "updated_at": "2026-01-20T02:24:02.736059Z"
 }

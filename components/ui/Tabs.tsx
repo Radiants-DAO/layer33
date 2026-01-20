@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useId, useCallback, useRef, useEffect } from 'react';
 import { Icon } from '@/components/icons';
 
 // ============================================================================
@@ -13,6 +13,11 @@ interface TabsContextValue {
   activeTab: string;
   setActiveTab: (id: string) => void;
   variant: TabsVariant;
+  tabIds: Map<string, string>;
+  panelIds: Map<string, string>;
+  registerTab: (value: string, tabId: string, panelId: string) => void;
+  tabsListRef: React.RefObject<HTMLDivElement | null>;
+  tabValues: string[];
 }
 
 interface TabsProps {
@@ -87,6 +92,7 @@ const triggerBaseStyles = `
   cursor-pointer select-none
   text-black
   relative
+  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2
 `;
 
 /**
@@ -148,21 +154,36 @@ export function Tabs({
 }: TabsProps) {
   // Uncontrolled mode uses internal state
   const [internalValue, setInternalValue] = useState(defaultValue || '');
-  
+  const [tabIds] = useState<Map<string, string>>(() => new Map());
+  const [panelIds] = useState<Map<string, string>>(() => new Map());
+  const [tabValues, setTabValues] = useState<string[]>([]);
+  const tabsListRef = useRef<HTMLDivElement>(null);
+
   // Determine if controlled or uncontrolled
   const isControlled = value !== undefined;
   const activeTab = isControlled ? value : internalValue;
-  
-  const setActiveTab = (newValue: string) => {
+
+  const setActiveTab = useCallback((newValue: string) => {
     if (isControlled) {
       onValueChange?.(newValue);
     } else {
       setInternalValue(newValue);
     }
-  };
+  }, [isControlled, onValueChange]);
+
+  const registerTab = useCallback((tabValue: string, tabId: string, panelId: string) => {
+    tabIds.set(tabValue, tabId);
+    panelIds.set(tabValue, panelId);
+    setTabValues(prev => {
+      if (!prev.includes(tabValue)) {
+        return [...prev, tabValue];
+      }
+      return prev;
+    });
+  }, [tabIds, panelIds]);
 
   return (
-    <TabsContext.Provider value={{ activeTab, setActiveTab, variant }}>
+    <TabsContext.Provider value={{ activeTab, setActiveTab, variant, tabIds, panelIds, registerTab, tabsListRef, tabValues }}>
       <div className={className}>
         {children}
       </div>
@@ -174,8 +195,55 @@ export function Tabs({
  * Container for tab triggers - Webflow-style tab menu
  */
 export function TabList({ children, className = '' }: TabListProps) {
+  const { tabsListRef, activeTab, setActiveTab, tabValues } = useTabsContext();
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    const currentIndex = tabValues.indexOf(activeTab);
+    if (currentIndex === -1) return;
+
+    let newIndex = currentIndex;
+
+    switch (e.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        e.preventDefault();
+        newIndex = (currentIndex + 1) % tabValues.length;
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        e.preventDefault();
+        newIndex = (currentIndex - 1 + tabValues.length) % tabValues.length;
+        break;
+      case 'Home':
+        e.preventDefault();
+        newIndex = 0;
+        break;
+      case 'End':
+        e.preventDefault();
+        newIndex = tabValues.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    if (newIndex !== currentIndex) {
+      setActiveTab(tabValues[newIndex]);
+      // Focus the new tab
+      const tabsContainer = tabsListRef.current;
+      if (tabsContainer) {
+        const buttons = tabsContainer.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+        buttons[newIndex]?.focus();
+      }
+    }
+  }, [activeTab, setActiveTab, tabValues, tabsListRef]);
+
   return (
-    <div className={`flex gap-1 px-2 py-2 ${className}`}>
+    <div
+      ref={tabsListRef}
+      role="tablist"
+      onKeyDown={handleKeyDown}
+      className={`flex gap-1 px-2 py-2 ${className}`}
+    >
       {children}
     </div>
   );
@@ -190,8 +258,15 @@ export function TabTrigger({
   iconName,
   className = '',
 }: TabTriggerProps) {
-  const { activeTab, setActiveTab, variant } = useTabsContext();
+  const { activeTab, setActiveTab, variant, tabIds, panelIds, registerTab } = useTabsContext();
   const isActive = activeTab === value;
+  const tabId = useId();
+  const panelId = useId();
+
+  // Register this tab on mount
+  useEffect(() => {
+    registerTab(value, tabId, panelId);
+  }, [value, tabId, panelId, registerTab]);
 
   const variantStyle = variant === 'pill'
     ? (isActive ? pillStyles.active : pillStyles.inactive)
@@ -210,13 +285,16 @@ export function TabTrigger({
     <button
       type="button"
       role="tab"
+      id={tabId}
       aria-selected={isActive}
+      aria-controls={panelIds.get(value)}
+      tabIndex={isActive ? 0 : -1}
       onClick={() => setActiveTab(value)}
       className={classes}
     >
       <span className="flex items-center gap-2">
         {iconName && (
-          <span className="opacity-70">
+          <span className="opacity-70" aria-hidden="true">
             <Icon name={iconName} size={16} />
           </span>
         )}
@@ -234,7 +312,14 @@ export function TabContent({
   children,
   className = '',
 }: TabContentProps) {
-  const { activeTab, variant } = useTabsContext();
+  const { activeTab, variant, tabIds, panelIds, registerTab } = useTabsContext();
+  const panelId = useId();
+  const tabId = useId();
+
+  // Register this panel on mount
+  useEffect(() => {
+    registerTab(value, tabId, panelId);
+  }, [value, tabId, panelId, registerTab]);
 
   if (activeTab !== value) {
     return null;
@@ -246,8 +331,11 @@ export function TabContent({
     : className;
 
   return (
-    <div 
-      role="tabpanel" 
+    <div
+      role="tabpanel"
+      id={panelIds.get(value) || panelId}
+      aria-labelledby={tabIds.get(value) || tabId}
+      tabIndex={0}
       className={contentClasses}
     >
       {children}
@@ -256,4 +344,3 @@ export function TabContent({
 }
 
 export default Tabs;
-

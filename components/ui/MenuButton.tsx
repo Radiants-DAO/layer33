@@ -17,7 +17,7 @@ interface MenuButtonProps {
 
 /**
  * 3x3 grid menu button with animated cells
- * 
+ *
  * Features:
  * - Staggered color animations on hover (purple, green, blue pattern)
  * - Cells at positions 2, 4, 6, 8 fade out when menu is open
@@ -26,7 +26,7 @@ interface MenuButtonProps {
  */
 export function MenuButton({ isOpen, onClick, onClose, className = '', useBlendMode = true }: MenuButtonProps) {
   const handleClose = onClose || onClick;
-  
+
   // Grid configuration: 3x3 = 9 cells
   // Pattern: Purple, Green, Blue / Green, Blue, Purple / Blue, Purple, Green
   // Positions 2, 4, 6, 8 (0-indexed: 1, 3, 5, 7) fade out when menu is open
@@ -43,15 +43,16 @@ export function MenuButton({ isOpen, onClick, onClose, className = '', useBlendM
   ];
 
   const renderGrid = () => (
-    <div className="backdrop-blur-[0.25rem] cursor-pointer flex justify-center items-center transition-all duration-300 hover:border-black active:scale-[0.88] group h-[1.25rem]">
+    <div className="backdrop-blur-[0.25rem] flex justify-center items-center transition-colors duration-300 hover:border-black active:scale-[0.88] group h-[1.25rem]">
       <div className="grid grid-cols-3 gap-1 p-1">
         {gridConfig.map((cell, index) => (
           <div
             key={index}
-            className={`${useBlendMode ? 'bg-white' : 'bg-black'} ${cell.hoverColor} w-1 h-1 transition-all duration-300 transition-[opacity,background-color] ${
+            className={`${useBlendMode ? 'bg-white' : 'bg-black'} ${cell.hoverColor} w-1 h-1 transition-opacity duration-300 transition-colors ${
               cell.fadeOnOpen && isOpen ? 'opacity-0' : 'opacity-100'
             }`}
             style={{ transitionDelay: cell.delay }}
+            aria-hidden="true"
           />
         ))}
       </div>
@@ -61,44 +62,32 @@ export function MenuButton({ isOpen, onClick, onClose, className = '', useBlendM
   return (
     <>
       {/* Close Button - visible when menu is open */}
-      <div 
-        className={`absolute top-0 right-0 z-[1] cursor-pointer ${useBlendMode ? 'mix-blend-difference' : ''} transition-all duration-300 ${
-          isOpen ? 'opacity-100 pointer-events-auto scale-100' : 'opacity-0 pointer-events-none scale-90'
-        } ${className}`}
+      <button
+        type="button"
+        className={`absolute top-0 right-0 z-[1] cursor-pointer ${useBlendMode ? 'mix-blend-difference' : ''} transition-opacity duration-300 transition-transform ${
+          isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'
+        } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2 ${className}`}
         onClick={handleClose}
-        role="button"
         aria-expanded={isOpen}
         aria-label="Close menu"
         tabIndex={isOpen ? 0 : -1}
-        onKeyDown={(e) => {
-          if ((e.key === 'Enter' || e.key === ' ') && isOpen) {
-            e.preventDefault();
-            handleClose();
-          }
-        }}
       >
         {renderGrid()}
-      </div>
+      </button>
 
       {/* Open Button - visible when menu is closed */}
-      <div 
-        className={`absolute top-0 right-0 z-[1] cursor-pointer ${useBlendMode ? 'mix-blend-difference' : ''} transition-all duration-300 ${
-          isOpen ? 'opacity-0 pointer-events-none scale-90' : 'opacity-100 pointer-events-auto scale-100'
-        } ${className}`}
+      <button
+        type="button"
+        className={`absolute top-0 right-0 z-[1] cursor-pointer ${useBlendMode ? 'mix-blend-difference' : ''} transition-opacity duration-300 transition-transform ${
+          isOpen ? 'opacity-0 scale-90 pointer-events-none' : 'opacity-100 scale-100'
+        } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2 ${className}`}
         onClick={onClick}
-        role="button"
         aria-expanded={isOpen}
         aria-label="Open menu"
         tabIndex={isOpen ? -1 : 0}
-        onKeyDown={(e) => {
-          if ((e.key === 'Enter' || e.key === ' ') && !isOpen) {
-            e.preventDefault();
-            onClick();
-          }
-        }}
       >
         {renderGrid()}
-      </div>
+      </button>
     </>
   );
 }

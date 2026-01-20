@@ -91,10 +91,8 @@ export function StakingForm() {
 
       <div className="stake_form w-form">
         <form
-          id="email-form"
-          name="email-form"
-          data-name="Email Form"
-          method="get"
+          id="staking-form"
+          name="staking-form"
           className="form"
           onSubmit={handleSubmit}
         >
@@ -109,9 +107,9 @@ export function StakingForm() {
                 You Stake
               </Label>
               <div className="flex items-center gap-2">
-                <Label htmlFor="balance" className="caption uppercase">
+                <span className="caption uppercase">
                   Total Balance: {wallet.balance} SOL
-                </Label>
+                </span>
                 {wallet.address && (
                   <span className="caption uppercase">
                     {wallet.address.slice(0, 6)}...{wallet.address.slice(-4)}
@@ -125,7 +123,8 @@ export function StakingForm() {
                 name="Amount"
                 type="number"
                 step="0.01"
-                placeholder="0.00 SOL"
+                placeholder="0.00 SOL…"
+                autoComplete="off"
                 variant="dark"
                 fullWidth
                 value={transaction.amount}
@@ -170,12 +169,12 @@ export function StakingForm() {
           {/* You Receive Section */}
           <div className="div-block mb-6">
             <div className="flex flex-row items-start gap-x-2 gap-y-2">
-              <Label htmlFor="receive" className="caption uppercase">
+              <span className="caption uppercase">
                 You Receive
-              </Label>
-              <Label htmlFor="indiesol-balance" className="caption uppercase">
+              </span>
+              <span className="caption uppercase">
                 Total Balance: 0 INDIESOL
-              </Label>
+              </span>
             </div>
             <div className="received-field">
               {indiesolAmount} INDIESOL

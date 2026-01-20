@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useEscapeKey, useClickOutside } from './hooks/useModalBehavior';
 
@@ -106,6 +106,8 @@ export function DropdownMenuTrigger({ children, asChild }: DropdownMenuTriggerPr
       type="button"
       ref={triggerRef as React.RefObject<HTMLButtonElement>}
       onClick={handleClick}
+      aria-haspopup="menu"
+      aria-expanded={open}
     >
       {children}
     </button>
@@ -128,6 +130,59 @@ export function DropdownMenuContent({ className = '', children }: DropdownMenuCo
   const contentRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0 });
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+
+  // Get all menu item buttons
+  const getMenuItems = useCallback(() => {
+    if (!contentRef.current) return [];
+    return Array.from(contentRef.current.querySelectorAll<HTMLButtonElement>('[role="menuitem"]:not([disabled])'));
+  }, []);
+
+  // Handle keyboard navigation
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    const items = getMenuItems();
+    if (items.length === 0) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setHighlightedIndex(prev => {
+          const next = prev + 1;
+          return next < items.length ? next : 0;
+        });
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setHighlightedIndex(prev => {
+          const next = prev - 1;
+          return next >= 0 ? next : items.length - 1;
+        });
+        break;
+      case 'Home':
+        e.preventDefault();
+        setHighlightedIndex(0);
+        break;
+      case 'End':
+        e.preventDefault();
+        setHighlightedIndex(items.length - 1);
+        break;
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        if (highlightedIndex >= 0 && items[highlightedIndex]) {
+          items[highlightedIndex].click();
+        }
+        break;
+    }
+  }, [getMenuItems, highlightedIndex]);
+
+  // Focus highlighted item
+  useEffect(() => {
+    if (highlightedIndex >= 0) {
+      const items = getMenuItems();
+      items[highlightedIndex]?.focus();
+    }
+  }, [highlightedIndex, getMenuItems]);
 
   useEffect(() => {
     setMounted(true);
@@ -176,12 +231,20 @@ export function DropdownMenuContent({ className = '', children }: DropdownMenuCo
   // Handle escape
   useEscapeKey(open, () => setOpen(false));
 
+  // Reset highlighted index when opening
+  useEffect(() => {
+    if (open) {
+      setHighlightedIndex(-1);
+    }
+  }, [open]);
+
   if (!mounted || !open) return null;
 
   return createPortal(
     <div
       ref={contentRef}
       role="menu"
+      onKeyDown={handleKeyDown}
       className={`
         fixed z-50
         min-w-[8rem]
@@ -239,12 +302,14 @@ export function DropdownMenuItem({
       role="menuitem"
       onClick={handleClick}
       disabled={disabled}
+      tabIndex={-1}
       className={`
         w-full px-4 py-2
         text-left
         font-alfacad text-base
         ${destructive ? 'text-accent-1' : 'text-black'}
-        ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green cursor-pointer'}
+        ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green focus:bg-green cursor-pointer'}
+        focus-visible:outline-none
         ${className}
       `.trim()}
     >
