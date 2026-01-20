@@ -7,7 +7,7 @@
   "epic": "fn-1-cs3",
   "evidence": {
     "commits": [
-      "de8722fd7f3deed6822466f1cb9e0031fee8e32d"
+      "de8722f"
     ],
     "prs": [],
     "tests": [
@@ -19,5 +19,5 @@
   "spec_path": ".flow/tasks/fn-1-cs3.6.md",
   "status": "done",
   "title": "Delete AppWindow and remove react-draggable",
-  "updated_at": "2026-01-20T02:01:14.661424Z"
+  "updated_at": "2026-01-20T02:05:09.651453Z"
 }

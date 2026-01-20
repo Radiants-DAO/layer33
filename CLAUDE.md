@@ -21,19 +21,13 @@ Layer33 is a Next.js 16 App Router application for a coalition of independent So
 - **components/ui/** - Design system component library (Button, Card, Dialog, etc.) - import from `@/components/ui`
 - **components/33layout/** - Layout primitives (Container, Section, PagePadding, Footer)
 - **components/Rad_os/** - Window management components (MobileAppModal, WindowTitleBar)
-- **devtools/** - Development-only tools panel with CSS variables, typography, and component inspection
 - **hooks/** - Custom React hooks (useWindowManager, useScrollHide, useStaking)
 - **lib/validators/** - Validator data types and API utilities for Solana validator integration
 
 ### State Management
 
 Zustand stores are used for:
-- **devtools/store/** - DevTools panel state with slices for variables, typography, components, assets, and mock states
 - **hooks/useStaking.ts** - Staking interface state
-
-### DevTools
-
-Toggle with `Shift+Cmd+K` (Mac) / `Shift+Ctrl+K` (Windows) in development. Automatically disabled in production.
 
 ### Path Aliases
 

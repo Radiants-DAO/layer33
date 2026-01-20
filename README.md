@@ -65,7 +65,6 @@ layer33/
 ├── app/                    # Next.js App Router pages
 │   ├── api/               # API routes
 │   ├── brand-assets/      # Brand assets page
-│   ├── design-system/     # Design system documentation
 │   ├── media/             # Media assets page
 │   ├── staking/           # Staking interface
 │   └── page.tsx           # Homepage
@@ -74,7 +73,6 @@ layer33/
 │   ├── icons/            # Icon system
 │   ├── ui/               # UI component library
 │   └── ...
-├── devtools/             # Development tools panel
 ├── hooks/                # Custom React hooks
 ├── lib/                  # Utility libraries
 └── public/               # Static assets
