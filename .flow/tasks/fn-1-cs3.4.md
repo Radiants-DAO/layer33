@@ -40,9 +40,8 @@ The connect/disconnect functions should be no-ops or require real wallet adapter
 - [ ] Hook returns valid (disconnected) wallet state
 - [ ] No runtime errors when StakingForm mounts
 ## Done summary
-TBD
-
+Refactored useStaking hook to remove all devtools dependencies by replacing mock state with local React useState, simplifying connect/disconnect/stake functions to work with real wallet adapter callbacks or show warning toasts.
 ## Evidence
-- Commits:
-- Tests:
+- Commits: fddb9fee35a2a0b03229d63d65d85c01639ef8a1
+- Tests: npm run build
 - PRs:
