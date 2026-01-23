@@ -1,6 +1,6 @@
 import { MobileNav } from '@/components/MobileNav';
 import { menuItems } from '@/components/navConfig';
-import { StakingForm } from './components/StakingForm';
+import { StakingTabs } from './components/StakingTabs';
 import { DecorationDiv } from '@/components/ui/DecorationDiv';
 import { Footer } from '@/components/33layout';
 import { FAQSection } from '@/app/components/FAQSection';
@@ -15,7 +15,7 @@ export default function StakingPage() {
       <section className="section_staking-hero">
         <div className="page-padding">
           <div className="container-large w-full max-w-[77rem] mx-auto">
-            <StakingForm />
+            <StakingTabs />
 
             {/* Hero Text Block */}
             <div className="container-small w-full max-w-[64rem] mx-auto mt-8 md:mt-12">
