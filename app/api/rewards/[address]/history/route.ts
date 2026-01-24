@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const revalidate = 60; // Cache for 60 seconds
 
-const REWARDS_API_URL = process.env.REWARDS_API_URL || 'http://134.122.34.66';
+const REWARDS_API_URL = (process.env.REWARDS_API_URL || 'https://api.layer33.com').replace(/\/$/, '');
 
 export async function GET(
   request: NextRequest,
