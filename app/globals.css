@@ -789,6 +789,31 @@ body {
   width: 100%;
 }
 
+.w-form {
+  width: 100%;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 768px) {
+  .w-form {
+    max-width: 75rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .w-form {
+    max-width: 75rem;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
 .form {
   @apply flex flex-col gap-x-4 gap-y-4;
 }
@@ -797,6 +822,31 @@ body {
   @apply flex flex-col gap-x-4 gap-y-4 p-8;
   border: 1px solid var(--color-border-tertiary);
   background-color: var(--color-bg-secondary);
+  width: 100%;
+  min-width: 20rem;
+}
+
+@media (min-width: 768px) {
+  .div-block {
+    min-width: 36rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .div-block {
+    min-width: 50rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .div-block {
+    min-width: 60rem;
+  }
+}
+
+/* Smaller variant for grid layouts */
+.grid .div-block {
+  min-width: 0;
 }
 
 .position-relative {
@@ -857,5 +907,32 @@ body {
     padding-top: 10rem;
     padding-bottom: 10rem;
   }
+}
+
+/* ============================================================================
+   Staking Tabs
+   ============================================================================ */
+
+/* Tab triggers that work on split black/white background */
+.staking-tabs-list {
+  @apply mix-blend-difference;
+}
+
+.staking-tabs-list [role="tab"] {
+  @apply text-white border-white transition-all;
+  background-color: transparent;
+  opacity: 0.7;
+}
+
+.staking-tabs-list [role="tab"]:hover {
+  opacity: 1;
+}
+
+.staking-tabs-list [role="tab"][aria-selected="true"] {
+  @apply text-black;
+  background-color: white;
+  mix-blend-mode: normal;
+  opacity: 1;
+  box-shadow: none;
 }
 
