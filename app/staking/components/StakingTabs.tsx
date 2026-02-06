@@ -10,7 +10,7 @@ export function StakingTabs() {
   return (
     <div className="staking_form">
       {/* Header with title and wallet button */}
-      <div className="flex flex-row items-center justify-between mb-6">
+      <div className="flex flex-col items-center gap-4 mb-6 md:flex-row md:justify-between">
         <div className="flex flex-row items-center gap-x-2 gap-y-2">
           <div className="heading-line"></div>
           <h1 className="heading-style-h2">
