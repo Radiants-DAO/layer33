@@ -15,7 +15,7 @@ import { getAssociatedTokenAddress, getAccount } from '@solana/spl-token';
 type TransactionStatus = 'idle' | 'signing' | 'pending' | 'success' | 'error';
 
 export function DirectStakeTab() {
-  const { publicKey, sendTransaction, connected } = useWallet();
+  const { publicKey, signTransaction, connected } = useWallet();
   const { connection } = useConnection();
   const { addToast } = useToast();
 
@@ -104,6 +104,15 @@ export function DirectStakeTab() {
       return;
     }
 
+    if (!signTransaction) {
+      addToast({
+        variant: 'error',
+        title: 'Wallet Error',
+        description: 'Wallet does not support transaction signing.',
+      });
+      return;
+    }
+
     setTxStatus('signing');
 
     try {
@@ -131,15 +140,27 @@ export function DirectStakeTab() {
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = publicKey;
 
-      // Sign with stake pool signers
+      // Simulate transaction before signing to catch failures early
+      const simulation = await connection.simulateTransaction(transaction);
+      if (simulation.value.err) {
+        throw new Error(`Transaction simulation failed: ${JSON.stringify(simulation.value.err)}`);
+      }
+
+      // Sign with Phantom first (per Phantom docs: sign with wallet first, then other signers)
+      const signedTransaction = await signTransaction(transaction);
+
+      // Then add stake pool signer signatures
       if (signers.length > 0) {
-        transaction.partialSign(...signers);
+        signedTransaction.partialSign(...signers);
       }
 
       setTxStatus('pending');
 
-      // Send transaction
-      const signature = await sendTransaction(transaction, connection);
+      // Send the fully signed transaction
+      const signature = await connection.sendRawTransaction(signedTransaction.serialize(), {
+        skipPreflight: false,
+        preflightCommitment: 'confirmed',
+      });
 
       // Confirm transaction
       await connection.confirmTransaction({
