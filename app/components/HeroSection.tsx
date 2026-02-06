@@ -42,7 +42,15 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* Text Content Section */}
+      </div>
+    </div>
+  );
+}
+
+export function TaglineSection() {
+  return (
+    <section>
+      <div className="page-padding">
         <div className="w-full max-w-[77rem] mx-auto relative">
           <div className="bg-neutral-neutral-1 text-center flex justify-center items-center relative py-12 px-6 md:py-24 md:px-20">
             <img
@@ -66,6 +74,6 @@ export function HeroSection() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
