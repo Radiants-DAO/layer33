@@ -15,14 +15,21 @@ export function WalletButton() {
       <style jsx global>{`
         .wallet-button-wrapper .wallet-adapter-button {
           font-family: var(--font-alfacad), sans-serif;
-          font-size: 0.875rem;
+          font-size: 0.75rem;
           text-transform: uppercase;
           border-radius: 0;
           background-color: var(--color-green);
           color: var(--color-black);
           border: 1px solid var(--color-black);
-          padding: 0.5rem 1rem;
+          padding: 0.5rem 0.75rem;
           transition: all 0.15s ease;
+          white-space: nowrap;
+        }
+        @media (min-width: 768px) {
+          .wallet-button-wrapper .wallet-adapter-button {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+          }
         }
         .wallet-button-wrapper .wallet-adapter-button:hover {
           background-color: var(--color-green);
